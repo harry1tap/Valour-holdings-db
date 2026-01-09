@@ -30,70 +30,72 @@ export function useAuth(): UseAuthReturn {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const supabase = createBrowserClient()
-
   useEffect(() => {
-    // Get initial session
-    const getUser = async () => {
+    const supabase = createBrowserClient()
+    let timeoutId: NodeJS.Timeout | null = null
+
+    console.log('useAuth: Setting up auth subscription')
+
+    // Safety timeout - force loading to false after 10 seconds
+    timeoutId = setTimeout(() => {
+      console.log('useAuth: Timeout reached, forcing loading to false')
+      setLoading(false)
+    }, 10000)
+
+    // Fetch profile from API route (server-side)
+    const fetchProfile = async (userId: string) => {
+      console.log('useAuth: Fetching profile via API for user:', userId)
       try {
-        const {
-          data: { user: currentUser },
-          error: userError,
-        } = await supabase.auth.getUser()
+        const response = await fetch('/api/auth/profile')
 
-        if (userError) throw userError
-
-        setUser(currentUser)
-
-        if (currentUser) {
-          // Fetch user profile from user_profiles table
-          const { data: profileData, error: profileError } = await supabase
-            .from('user_profiles')
-            .select('*')
-            .eq('id', currentUser.id)
-            .single()
-
-          if (profileError) throw profileError
-
-          setProfile(profileData)
-        } else {
-          setProfile(null)
+        if (!response.ok) {
+          throw new Error(`Failed to fetch profile: ${response.statusText}`)
         }
+
+        const profileData = await response.json()
+        console.log('useAuth: Profile fetched successfully, role:', profileData.role)
+
+        setProfile(profileData)
+        setError(null)
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred')
-      } finally {
-        setLoading(false)
+        console.error('useAuth: Error fetching profile:', err)
+        setError(err instanceof Error ? err.message : 'Failed to fetch profile')
+        setProfile(null)
       }
     }
 
-    getUser()
-
-    // Listen for auth changes
+    // Listen for auth state changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setUser(session?.user ?? null)
+      console.log('useAuth: onAuthStateChange triggered, event:', event, 'hasSession:', !!session)
 
-      if (session?.user) {
-        // Refetch profile on auth change
-        const { data: profileData } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
+      try {
+        setUser(session?.user ?? null)
 
-        setProfile(profileData)
-      } else {
-        setProfile(null)
+        if (session?.user) {
+          // Fetch profile via API route (server-side query)
+          await fetchProfile(session.user.id)
+        } else {
+          console.log('useAuth: No session, clearing profile')
+          setProfile(null)
+        }
+      } catch (err) {
+        console.error('useAuth: Exception in onAuthStateChange:', err)
+        setError(err instanceof Error ? err.message : 'An error occurred')
+      } finally {
+        console.log('useAuth: Setting loading to false')
+        if (timeoutId) clearTimeout(timeoutId)
+        setLoading(false)
       }
-
-      setLoading(false)
     })
 
     return () => {
+      console.log('useAuth: Cleanup - unsubscribing')
+      if (timeoutId) clearTimeout(timeoutId)
       subscription.unsubscribe()
     }
-  }, [supabase])
+  }, [])
 
   return {
     user,

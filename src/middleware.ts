@@ -16,6 +16,13 @@ export async function middleware(request: NextRequest) {
   // Update Supabase session and get user
   const { user, response } = await updateSession(request)
 
+  // Debug logging
+  console.log('🔒 Middleware:', {
+    path: request.nextUrl.pathname,
+    hasUser: !!user,
+    userId: user?.id,
+  })
+
   // Define protected routes
   const protectedPaths = ['/dashboard', '/leads', '/team', '/settings']
   const isProtectedRoute = protectedPaths.some((path) =>
@@ -24,6 +31,7 @@ export async function middleware(request: NextRequest) {
 
   // Redirect unauthenticated users trying to access protected routes
   if (isProtectedRoute && !user) {
+    console.log('🚫 Redirecting to login - no user found')
     const redirectUrl = request.nextUrl.clone()
     redirectUrl.pathname = '/login'
     redirectUrl.searchParams.set('redirectTo', request.nextUrl.pathname)

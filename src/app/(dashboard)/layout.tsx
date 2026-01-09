@@ -3,31 +3,36 @@
  * Layout for all authenticated pages
  *
  * Features:
- * - Header with user menu
- * - Sidebar with navigation
+ * - Collapsible sidebar with role-based navigation
+ * - Header with theme toggle
  * - Main content area
  * - Responsive design
  */
 
-import { Header } from '@/components/layout/Header'
-import { Sidebar } from '@/components/layout/Sidebar'
+import { cookies } from "next/headers"
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/app-sidebar"
+import { Header } from "@/components/layout/Header"
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const cookieStore = await cookies()
+  const sidebarState = cookieStore.get("sidebar_state")
+  // Default to true (open) if cookie doesn't exist
+  const defaultOpen = sidebarState ? sidebarState.value === "true" : true
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <div className="flex-1 flex">
-        <Sidebar />
-        <main className="flex-1 overflow-auto">
-          <div className="container mx-auto py-6 px-6 max-w-7xl">
-            {children}
-          </div>
+    <SidebarProvider defaultOpen={defaultOpen}>
+      <AppSidebar />
+      <SidebarInset>
+        <Header />
+        <main className="flex-1 overflow-y-auto p-6">
+          {children}
         </main>
-      </div>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }

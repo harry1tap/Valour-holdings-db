@@ -1,18 +1,85 @@
 /**
  * Dashboard Page
- * Main dashboard with metrics and visualizations
- *
- * TODO Phase 2:
- * - Add MetricCard components for 12 core metrics
- * - Add DateRangeFilter
- * - Add charts (Line, Bar, Donut)
- * - Add real-time subscriptions
- * - Add role-based data filtering
+ * Main dashboard with real-time metrics and visualizations
  */
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { createServerClient } from '@/lib/supabase/server'
+import { DashboardContent } from '@/components/dashboard/DashboardContent'
+import { DateRangeFilter } from '@/components/dashboard/DateRangeFilter'
+import { getThisMonth, parseDateParam } from '@/lib/utils/date'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { AlertCircle } from 'lucide-react'
+import type { UserProfile } from '@/types/database'
 
-export default async function DashboardPage() {
+interface DashboardPageProps {
+  searchParams: {
+    dateFrom?: string
+    dateTo?: string
+  }
+}
+
+export default async function DashboardPage({ searchParams }: DashboardPageProps) {
+  // Get authenticated user profile server-side
+  const supabase = await createServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  console.log('Dashboard: User check', {
+    hasUser: !!user,
+    userId: user?.id
+  })
+
+  // Don't redirect - middleware handles auth
+  // If no user somehow, show error instead
+  if (!user) {
+    return (
+      <div className="p-6">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Authentication Error</AlertTitle>
+          <AlertDescription>
+            Unable to load user session. Please try logging out and back in.
+          </AlertDescription>
+        </Alert>
+      </div>
+    )
+  }
+
+  const { data: profile, error } = await supabase
+    .from('user_profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single() as { data: UserProfile | null; error: Error | null }
+
+  console.log('Dashboard: Profile check', {
+    hasProfile: !!profile,
+    error: error?.message
+  })
+
+  // Handle profile lookup failure gracefully
+  if (error || !profile) {
+    return (
+      <div className="p-6">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Profile Error</AlertTitle>
+          <AlertDescription>
+            Unable to load user profile: {error?.message || 'Profile not found'}
+            <br />
+            <br />
+            User ID: {user.id}
+            <br />
+            This user may not have a profile record in the database.
+          </AlertDescription>
+        </Alert>
+      </div>
+    )
+  }
+
+  // Parse date params or use default (This Month)
+  const defaultRange = getThisMonth()
+  const dateFrom = parseDateParam(searchParams.dateFrom) ?? defaultRange.from
+  const dateTo = parseDateParam(searchParams.dateTo) ?? defaultRange.to
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -23,50 +90,16 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      {/* Placeholder Content */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Welcome to Valour Holdings Dashboard</CardTitle>
-          <CardDescription>
-            Phase 1 Complete: Authentication & Layout
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <h3 className="font-semibold mb-2">Phase 1 Completed:</h3>
-            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-              <li>Project setup with Next.js 14, TypeScript, Tailwind</li>
-              <li>Supabase client configuration</li>
-              <li>Authentication system with login page</li>
-              <li>Protected routes with middleware</li>
-              <li>Header with user menu</li>
-              <li>Sidebar with role-based navigation</li>
-              <li>Dashboard layout</li>
-            </ul>
-          </div>
+      {/* Date Range Filter */}
+      <DateRangeFilter dateFrom={dateFrom} dateTo={dateTo} />
 
-          <div>
-            <h3 className="font-semibold mb-2">Next Steps (Phase 2):</h3>
-            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-              <li>Set up Supabase database and run migrations</li>
-              <li>Add 12 core dashboard metrics</li>
-              <li>Implement date range filtering</li>
-              <li>Create charts and visualizations</li>
-              <li>Add real-time data subscriptions</li>
-            </ul>
-          </div>
-
-          <div className="pt-4 border-t">
-            <p className="text-sm text-amber-600 font-medium">
-              ⚠️ To continue: Add your Supabase credentials to .env.local
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Copy .env.local.example to .env.local and fill in your Supabase
-              project credentials.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Dashboard Content - All metrics, charts, and tables */}
+      <DashboardContent
+        userRole={profile.role}
+        userName={profile.full_name}
+        dateFrom={dateFrom}
+        dateTo={dateTo}
+      />
     </div>
   )
 }

@@ -12,8 +12,20 @@ import { createBrowserClient as createClient } from '@supabase/ssr'
 import type { Database } from '@/types/database'
 
 export function createBrowserClient() {
-  return createClient<Database>(
+  console.log('Creating Supabase browser client:', {
+    url: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    hasAnonKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  })
+
+  const client = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
+
+  console.log('Supabase client created:', {
+    hasRpcMethod: typeof client.rpc === 'function',
+    hasFromMethod: typeof client.from === 'function',
+  })
+
+  return client
 }
