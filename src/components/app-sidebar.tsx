@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { LayoutDashboard, Users, FolderOpen, Settings, ChevronDown } from "lucide-react"
 
 import {
@@ -57,6 +57,7 @@ const navItems = [
 
 export function AppSidebar() {
   const pathname = usePathname()
+  const router = useRouter()
   const { profile, role, loading, error } = useAuth()
 
   // If auth errors or takes too long, show warning in console
@@ -72,6 +73,24 @@ export function AppSidebar() {
     if (!role || role === 'installer') return []
     return navItems.filter((item) => item.allowedRoles.includes(role as 'admin' | 'account_manager' | 'field_rep'))
   }, [role])
+
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+      })
+
+      if (response.ok) {
+        router.push('/login')
+        router.refresh()
+      } else {
+        console.error('Logout failed')
+      }
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
+  }
 
   return (
     <Sidebar collapsible="icon">
@@ -170,12 +189,8 @@ export function AppSidebar() {
                 <DropdownMenuItem asChild>
                   <Link href="/settings">Settings</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <form action="/api/auth/logout" method="POST">
-                    <button type="submit" className="w-full text-left">
-                      Log out
-                    </button>
-                  </form>
+                <DropdownMenuItem onClick={handleLogout}>
+                  Log out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
