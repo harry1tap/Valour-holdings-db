@@ -8,6 +8,8 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 import type { UserProfile } from '@/types/database'
 
+export const dynamic = 'force-dynamic'
+
 /**
  * GET /api/users
  * Fetch all users (admin only)

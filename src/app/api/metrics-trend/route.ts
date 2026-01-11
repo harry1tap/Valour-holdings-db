@@ -7,6 +7,8 @@ import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import type { UserProfile } from '@/types/database'
 
+export const dynamic = 'force-dynamic'
+
 interface MetricsTrendItem {
   date: string
   value: number

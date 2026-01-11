@@ -7,6 +7,8 @@ import { createServerClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import type { UserProfile } from '@/types/database'
 
+export const dynamic = 'force-dynamic'
+
 /**
  * GET /api/users/[id]
  * Get single user details (admin only)

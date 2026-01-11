@@ -5,7 +5,7 @@
 
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Calendar } from '@/components/ui/calendar'
 import { Button } from '@/components/ui/button'
@@ -35,7 +35,7 @@ interface DateRangeFilterProps {
   dateTo: Date
 }
 
-export function DateRangeFilter({ dateFrom, dateTo }: DateRangeFilterProps) {
+function DateRangeFilterContent({ dateFrom, dateTo }: DateRangeFilterProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -168,5 +168,17 @@ export function DateRangeFilter({ dateFrom, dateTo }: DateRangeFilterProps) {
         Current range: <span className="font-medium">{formatDateRangeForDisplay({ from: dateFrom, to: dateTo })}</span>
       </div>
     </Card>
+  )
+}
+
+export function DateRangeFilter(props: DateRangeFilterProps) {
+  return (
+    <Suspense fallback={
+      <Card className="p-4">
+        <div className="h-20 bg-muted animate-pulse rounded" />
+      </Card>
+    }>
+      <DateRangeFilterContent {...props} />
+    </Suspense>
   )
 }
