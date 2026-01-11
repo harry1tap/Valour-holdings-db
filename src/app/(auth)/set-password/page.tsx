@@ -248,7 +248,7 @@ export default function SetPasswordPage() {
             {/* Help Text */}
             <div className="mt-6 text-center text-sm text-muted-foreground">
               <p>
-                After setting your password, you'll be logged out and can sign in with your new credentials.
+                After setting your password, you&apos;ll be logged out and can sign in with your new credentials.
               </p>
             </div>
           </div>
