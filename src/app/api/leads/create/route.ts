@@ -28,11 +28,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user profile for role-based permissions
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = (await supabase
       .from('user_profiles')
       .select('role, full_name')
       .eq('id', user.id)
-      .single() as { data: Pick<UserProfile, 'role' | 'full_name'> | null; error: Error | null }
+      .single()) as { data: Pick<UserProfile, 'role' | 'full_name'> | null; error: Error | null }
 
     if (profileError || !profile) {
       console.error('API /leads/create - Profile error:', profileError)

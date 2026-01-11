@@ -5,6 +5,7 @@
 
 import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import type { UserProfile } from '@/types/database'
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,11 +33,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user profile for role-based filtering
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = (await supabase
       .from('user_profiles')
       .select('role, full_name')
       .eq('id', user.id)
-      .single()
+      .single()) as { data: Pick<UserProfile, 'role' | 'full_name'> | null; error: Error | null }
 
     if (profileError || !profile) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 })

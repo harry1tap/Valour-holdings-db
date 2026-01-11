@@ -5,6 +5,7 @@
 
 import { createServerClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import type { UserProfile } from '@/types/database'
 
 interface StatusUpdateRequest {
   survey_status: 'Pending' | 'Good Survey' | 'Bad Survey' | 'Sold Survey' | null
@@ -28,11 +29,11 @@ export async function PATCH(
     }
 
     // Get user profile for role-based access
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = (await supabase
       .from('user_profiles')
       .select('role, full_name, organization')
       .eq('id', user.id)
-      .single()
+      .single()) as { data: Pick<UserProfile, 'role' | 'full_name' | 'organization'> | null; error: Error | null }
 
     if (profileError || !profile) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 })

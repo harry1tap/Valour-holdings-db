@@ -5,6 +5,7 @@
 
 import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import type { UserProfile } from '@/types/database'
 
 export async function GET(
   request: NextRequest,
@@ -30,11 +31,11 @@ export async function GET(
     }
 
     // Get user profile for role-based access
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = (await supabase
       .from('user_profiles')
       .select('role, full_name, organization')
       .eq('id', user.id)
-      .single()
+      .single()) as { data: Pick<UserProfile, 'role' | 'full_name' | 'organization'> | null; error: Error | null }
 
     if (profileError || !profile) {
       console.error('API /leads/[id] - Profile error:', profileError)

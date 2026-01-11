@@ -44,11 +44,11 @@ export async function POST(request: NextRequest) {
     console.log('API /leads - User authenticated:', user.id)
 
     // Get user profile for role-based filtering
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = (await supabase
       .from('user_profiles')
       .select('role, full_name')
       .eq('id', user.id)
-      .single() as { data: Pick<UserProfile, 'role' | 'full_name'> | null; error: Error | null }
+      .single()) as { data: Pick<UserProfile, 'role' | 'full_name'> | null; error: Error | null }
 
     if (profileError || !profile) {
       console.error('API /leads - Profile error:', profileError)
@@ -138,11 +138,11 @@ export async function PUT(request: NextRequest) {
     }
 
     // Get user profile for role-based permissions
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = (await supabase
       .from('user_profiles')
       .select('role, full_name, organization')
       .eq('id', user.id)
-      .single() as { data: Pick<UserProfile, 'role' | 'full_name' | 'organization'> | null; error: Error | null }
+      .single()) as { data: Pick<UserProfile, 'role' | 'full_name' | 'organization'> | null; error: Error | null }
 
     if (profileError || !profile) {
       console.error('API /leads PUT - Profile error:', profileError)
@@ -208,11 +208,11 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Get user profile for role-based permissions
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = (await supabase
       .from('user_profiles')
       .select('role, full_name')
       .eq('id', user.id)
-      .single() as { data: Pick<UserProfile, 'role' | 'full_name'> | null; error: Error | null }
+      .single()) as { data: Pick<UserProfile, 'role' | 'full_name'> | null; error: Error | null }
 
     if (profileError || !profile) {
       console.error('API /leads DELETE - Profile error:', profileError)
