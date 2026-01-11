@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { LayoutDashboard, Users, FolderOpen, Settings, ChevronDown } from "lucide-react"
 
@@ -44,7 +45,7 @@ const navItems = [
     href: "/team",
     label: "Team Performance",
     icon: Users,
-    allowedRoles: ["admin", "account_manager"],
+    allowedRoles: ["admin"],
   },
   {
     href: "/settings",
@@ -78,8 +79,13 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href="/dashboard">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <LayoutDashboard className="size-4" />
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg overflow-hidden">
+                  <Image
+                    src="/logo.avif"
+                    alt="Valour Holdings"
+                    width={32}
+                    height={32}
+                  />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-semibold">Valour Holdings</span>

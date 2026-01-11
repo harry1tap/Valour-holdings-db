@@ -156,6 +156,10 @@ export function LeadDetailModal({
     if (userRole === 'field_rep') {
       return field === 'Notes' || field === 'Installer_Notes'
     }
+    if (userRole === 'installer') {
+      // Installers can ONLY edit Installer_Notes
+      return field === 'Installer_Notes'
+    }
     if (userRole === 'account_manager') {
       // Account managers can't edit financial fields
       const financialFields = [
@@ -169,7 +173,7 @@ export function LeadDetailModal({
     return false
   }
 
-  const canDelete = userRole !== 'field_rep'
+  const canDelete = userRole === 'admin' || userRole === 'account_manager'
 
   if (loading) {
     return (
@@ -394,17 +398,17 @@ export function LeadDetailModal({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="New">New</SelectItem>
-                      <SelectItem value="Contacted">Contacted</SelectItem>
-                      <SelectItem value="Qualified">Qualified</SelectItem>
+                      <SelectItem value="New Lead">New Lead</SelectItem>
                       <SelectItem value="Survey Booked">
                         Survey Booked
                       </SelectItem>
                       <SelectItem value="Survey Complete">
                         Survey Complete
                       </SelectItem>
-                      <SelectItem value="Sold">Sold</SelectItem>
-                      <SelectItem value="Lost">Lost</SelectItem>
+                      <SelectItem value="Install Complete">
+                        Install Complete
+                      </SelectItem>
+                      <SelectItem value="Fall Off">Fall Off</SelectItem>
                     </SelectContent>
                   </Select>
                 ) : (

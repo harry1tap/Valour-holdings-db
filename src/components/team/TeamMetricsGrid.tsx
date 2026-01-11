@@ -36,7 +36,7 @@ export function TeamMetricsGrid({ data, loading }: TeamMetricsGridProps) {
   // Calculate team-wide metrics
   const totalLeads = data.reduce((sum, staff) => sum + staff.total_leads, 0)
   const totalSurveys = data.reduce(
-    (sum, staff) => sum + staff.good_surveys + staff.bad_surveys + staff.sold_surveys,
+    (sum, staff) => sum + staff.pending_surveys + staff.good_surveys + staff.bad_surveys + staff.sold_surveys,
     0
   )
   const avgConversion =
@@ -76,7 +76,7 @@ export function TeamMetricsGrid({ data, loading }: TeamMetricsGridProps) {
         <CardContent>
           <div className="text-2xl font-bold">{formatNumber(totalSurveys)}</div>
           <p className="text-xs text-muted-foreground">
-            Good, Bad, and Sold surveys
+            Pending, Good, Bad, and Sold surveys
           </p>
         </CardContent>
       </Card>

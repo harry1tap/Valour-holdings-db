@@ -29,9 +29,29 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Fetch the lead using RPC function
+    // Get user profile for role-based access
+    const { data: profile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('role, full_name, organization')
+      .eq('id', user.id)
+      .single()
+
+    if (profileError || !profile) {
+      console.error('API /leads/[id] - Profile error:', profileError)
+      return NextResponse.json(
+        { error: 'Profile not found' },
+        { status: 404 }
+      )
+    }
+
+    console.log('API /leads/[id] - User role:', profile.role)
+
+    // Fetch the lead using RPC function with role-based filtering
     const { data, error } = await supabase.rpc('get_solar_lead_by_id', {
       p_lead_id: parseInt(leadId),
+      p_user_role: profile.role,
+      p_user_name: profile.full_name,
+      p_organization: profile.organization,
     } as never)
 
     if (error) {

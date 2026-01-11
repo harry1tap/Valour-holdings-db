@@ -279,16 +279,18 @@ export function LeadCreateModal({
               <div>
                 <Label htmlFor="Status">Status</Label>
                 <Select
-                  defaultValue="New"
+                  defaultValue="New Lead"
                   onValueChange={(value) => setValue('Status', value)}
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="New">New</SelectItem>
-                    <SelectItem value="Contacted">Contacted</SelectItem>
-                    <SelectItem value="Qualified">Qualified</SelectItem>
+                    <SelectItem value="New Lead">New Lead</SelectItem>
+                    <SelectItem value="Survey Booked">Survey Booked</SelectItem>
+                    <SelectItem value="Survey Complete">Survey Complete</SelectItem>
+                    <SelectItem value="Install Complete">Install Complete</SelectItem>
+                    <SelectItem value="Fall Off">Fall Off</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

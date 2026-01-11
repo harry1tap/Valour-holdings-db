@@ -127,12 +127,14 @@ export function DashboardMetrics({
           variant="default"
         />
 
-        {/* Metric 8: Split CPL Card (spans 2 columns) */}
-        <SplitCPLCard
-          cplOnline={metrics.cost_per_lead_online}
-          cplField={metrics.cost_per_lead_field}
-          loading={false}
-        />
+        {/* Metric 8: Split CPL Card (spans 2 columns) - Hidden for Account Managers */}
+        {userRole !== 'account_manager' && (
+          <SplitCPLCard
+            cplOnline={metrics.cost_per_lead_online}
+            cplField={metrics.cost_per_lead_field}
+            loading={false}
+          />
+        )}
       </div>
 
       {/* Empty state if no leads */}

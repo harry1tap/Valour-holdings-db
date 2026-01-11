@@ -41,20 +41,13 @@ export function useDashboardMetrics({
       setLoading(true)
       setError(null)
 
-      // Determine filtering based on role
-      const accountManagerFilter = userRole === 'account_manager' ? userName : null
-      const fieldRepFilter = userRole === 'field_rep' ? userName : null
-
       console.log('Fetching metrics:', {
         dateFrom: formatDateForDB(dateFrom),
         dateTo: formatDateForDB(dateTo),
         role: userRole,
-        accountManager: accountManagerFilter,
-        fieldRep: fieldRepFilter,
       })
 
-      // Call the API route instead of calling RPC directly
-      // This uses the service role key server-side for proper permissions
+      // Call the API route - server-side role enforcement handles filtering
       const response = await fetch('/api/metrics', {
         method: 'POST',
         headers: {
@@ -63,8 +56,6 @@ export function useDashboardMetrics({
         body: JSON.stringify({
           dateFrom: formatDateForDB(dateFrom),
           dateTo: formatDateForDB(dateTo),
-          accountManager: accountManagerFilter,
-          fieldRep: fieldRepFilter,
         }),
       })
 

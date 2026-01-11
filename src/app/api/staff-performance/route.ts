@@ -31,13 +31,26 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('API /staff-performance - User authenticated:', user.id)
+    // Get user profile for role-based filtering
+    const { data: profile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('role, full_name')
+      .eq('id', user.id)
+      .single()
 
-    // Call the RPC function
+    if (profileError || !profile) {
+      return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
+    }
+
+    console.log('API /staff-performance - User role:', profile.role)
+
+    // Call the RPC function with server-side role enforcement
     const { data, error } = await supabase.rpc('get_staff_performance', {
       p_date_from: dateFrom,
       p_date_to: dateTo,
-      p_account_manager: accountManager,
+      p_user_role: profile.role,
+      p_user_name: profile.full_name,
+      p_account_manager: accountManager || null,
     } as never)
 
     if (error) {

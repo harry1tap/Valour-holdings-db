@@ -124,14 +124,6 @@ export async function PUT(
       )
     }
 
-    // Validate Account Manager for Field Reps
-    if (role === 'field_rep' && !account_manager_name) {
-      return NextResponse.json(
-        { error: 'Account Manager is required for Field Reps' },
-        { status: 400 }
-      )
-    }
-
     // Update user
     const { data: updatedUser, error: updateError } = (await supabase
       .from('user_profiles')

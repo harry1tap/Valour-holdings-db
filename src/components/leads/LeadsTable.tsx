@@ -34,20 +34,17 @@ interface LeadsTableProps {
 
 // Status badge colors
 const statusColors: Record<string, string> = {
-  New: 'bg-blue-100 text-blue-800',
-  Contacted: 'bg-yellow-100 text-yellow-800',
-  Qualified: 'bg-green-100 text-green-800',
-  'Survey Booked': 'bg-purple-100 text-purple-800',
-  'Survey Complete': 'bg-indigo-100 text-indigo-800',
-  Sold: 'bg-green-500 text-white',
-  Lost: 'bg-red-100 text-red-800',
+  'New Lead': 'bg-chart-1/20 text-chart-1 dark:bg-chart-1/30 dark:text-chart-1',
+  'Survey Booked': 'bg-chart-2/20 text-chart-2 dark:bg-chart-2/30 dark:text-chart-2',
+  'Survey Complete': 'bg-chart-3/20 text-chart-3 dark:bg-chart-3/30 dark:text-chart-3',
+  'Install Complete': 'bg-primary text-primary-foreground',
+  'Fall Off': 'bg-destructive/20 text-destructive dark:bg-destructive/30 dark:text-destructive',
 }
 
 const surveyStatusColors: Record<string, string> = {
-  Good: 'bg-green-100 text-green-800',
-  Average: 'bg-yellow-100 text-yellow-800',
-  Poor: 'bg-orange-100 text-orange-800',
-  'Not Suitable': 'bg-red-100 text-red-800',
+  'Good Survey': 'bg-chart-5 text-white dark:bg-chart-5',
+  'Bad Survey': 'bg-destructive/20 text-destructive dark:bg-destructive/30 dark:text-destructive',
+  'Sold Survey': 'bg-primary text-primary-foreground',
 }
 
 export function LeadsTable({

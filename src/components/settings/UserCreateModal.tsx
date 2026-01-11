@@ -32,26 +32,12 @@ import { useState } from 'react'
 import type { UserRole } from '@/types/database'
 
 // Form validation schema
-const userCreateSchema = z
-  .object({
-    email: z.string().email('Valid email address required'),
-    full_name: z.string().min(2, 'Name must be at least 2 characters'),
-    role: z.enum(['admin', 'account_manager', 'field_rep']),
-    account_manager_name: z.string().optional(),
-  })
-  .refine(
-    (data) => {
-      // Account Manager required for Field Reps
-      if (data.role === 'field_rep') {
-        return !!data.account_manager_name && data.account_manager_name.length > 0
-      }
-      return true
-    },
-    {
-      message: 'Account Manager is required for Field Reps',
-      path: ['account_manager_name'],
-    }
-  )
+const userCreateSchema = z.object({
+  email: z.string().email('Valid email address required'),
+  full_name: z.string().min(2, 'Name must be at least 2 characters'),
+  role: z.enum(['admin', 'account_manager', 'field_rep']),
+  account_manager_name: z.string().optional(),
+})
 
 type UserCreateFormData = z.infer<typeof userCreateSchema>
 
@@ -194,12 +180,12 @@ export function UserCreateModal({
           {selectedRole === 'field_rep' && (
             <div>
               <Label htmlFor="account_manager_name">
-                Account Manager <span className="text-destructive">*</span>
+                Account Manager
               </Label>
               <Input
                 id="account_manager_name"
                 {...register('account_manager_name')}
-                placeholder="Enter Account Manager name"
+                placeholder="Enter Account Manager name (optional)"
               />
               {errors.account_manager_name && (
                 <p className="text-sm text-destructive mt-1">
@@ -207,7 +193,7 @@ export function UserCreateModal({
                 </p>
               )}
               <p className="text-sm text-muted-foreground mt-1">
-                Required for Field Rep role
+                Optional - for organizational purposes only
               </p>
             </div>
           )}

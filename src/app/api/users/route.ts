@@ -4,6 +4,7 @@
  */
 
 import { createServerClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 import type { UserProfile } from '@/types/database'
 
@@ -124,15 +125,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid email format' }, { status: 400 })
     }
 
-    // 5. Check if field_rep has account_manager_name
-    if (role === 'field_rep' && !account_manager_name) {
-      return NextResponse.json(
-        { error: 'Account Manager is required for Field Reps' },
-        { status: 400 }
-      )
-    }
-
-    // 6. Check if user already exists
+    // 5. Check if user already exists
     const { data: existingUser } = await supabase
       .from('user_profiles')
       .select('email')
@@ -147,13 +140,16 @@ export async function POST(request: Request) {
     }
 
     // 7. Send invitation email via Supabase Admin API
+    // Use admin client (service role key) for inviteUserByEmail
+    const adminClient = createAdminClient()
     const { data: invitedUser, error: inviteError } =
-      await supabase.auth.admin.inviteUserByEmail(email, {
+      await adminClient.auth.admin.inviteUserByEmail(email, {
         data: {
           full_name,
           role,
           account_manager_name,
         },
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/callback`,
       })
 
     if (inviteError) {
@@ -164,7 +160,8 @@ export async function POST(request: Request) {
     }
 
     // 8. Create user_profiles entry
-    const { data: newProfile, error: profileCreateError } = (await supabase
+    // Use admin client to bypass RLS policies
+    const { data: newProfile, error: profileCreateError } = (await adminClient
       .from('user_profiles')
       .insert({
         id: invitedUser.user.id,

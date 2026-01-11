@@ -11,7 +11,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export type UserRole = 'admin' | 'account_manager' | 'field_rep'
+export type UserRole = 'admin' | 'account_manager' | 'field_rep' | 'installer'
 
 export interface Database {
   public: {
@@ -23,6 +23,7 @@ export interface Database {
           full_name: string
           role: UserRole
           account_manager_name: string | null
+          organization: string | null
           is_active: boolean
           created_at: string
           updated_at: string
@@ -34,6 +35,7 @@ export interface Database {
           full_name: string
           role: UserRole
           account_manager_name?: string | null
+          organization?: string | null
           is_active?: boolean
           created_at?: string
           updated_at?: string
@@ -45,6 +47,7 @@ export interface Database {
           full_name?: string
           role?: UserRole
           account_manager_name?: string | null
+          organization?: string | null
           is_active?: boolean
           created_at?: string
           updated_at?: string
@@ -89,6 +92,7 @@ export interface Database {
           Installer_Notes: string | null
           Front_Elevation_Image: string | null
           Survey_Status: string | null
+          Contact_ID: string | null
         }
         Insert: {
           id?: number
@@ -123,6 +127,7 @@ export interface Database {
           Installer_Notes?: string | null
           Front_Elevation_Image?: string | null
           Survey_Status?: string | null
+          Contact_ID?: string | null
         }
         Update: {
           id?: number
@@ -157,6 +162,7 @@ export interface Database {
           Installer_Notes?: string | null
           Front_Elevation_Image?: string | null
           Survey_Status?: string | null
+          Contact_ID?: string | null
         }
       }
       expenses: {

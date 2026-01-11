@@ -303,7 +303,7 @@ DECLARE
 BEGIN
   -- Validate survey status
   IF p_survey_status IS NOT NULL
-     AND p_survey_status NOT IN ('Good Survey', 'Bad Survey', 'Sold Survey') THEN
+     AND p_survey_status NOT IN ('Pending', 'Good Survey', 'Bad Survey', 'Sold Survey') THEN
     RAISE EXCEPTION 'Invalid survey status: %', p_survey_status;
   END IF;
 

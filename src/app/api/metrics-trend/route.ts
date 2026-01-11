@@ -14,15 +14,9 @@ interface MetricsTrendItem {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { dateFrom, dateTo, accountManager, fieldRep, interval = 'day' } = body
+    const { dateFrom, dateTo, interval = 'day' } = body
 
-    console.log('API /metrics-trend - Request:', {
-      dateFrom,
-      dateTo,
-      accountManager,
-      fieldRep,
-      interval,
-    })
+    console.log('API /metrics-trend - Request:', { dateFrom, dateTo, interval })
 
     // Create server client (uses service role key)
     const supabase = await createServerClient()
@@ -38,14 +32,26 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('API /metrics-trend - User authenticated:', user.id)
+    // Get user profile for role-based filtering
+    const { data: profile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('role, full_name, organization')
+      .eq('id', user.id)
+      .single()
 
-    // Call the RPC function for metrics trend
+    if (profileError || !profile) {
+      return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
+    }
+
+    console.log('API /metrics-trend - User role:', profile.role)
+
+    // Call the RPC function with server-side role enforcement
     const { data, error } = await supabase.rpc('get_metrics_trend', {
       p_date_from: dateFrom,
       p_date_to: dateTo,
-      p_account_manager: accountManager,
-      p_field_rep: fieldRep,
+      p_user_role: profile.role,
+      p_user_name: profile.full_name,
+      p_organization: profile.organization,
       p_interval: interval,
     } as never)
 

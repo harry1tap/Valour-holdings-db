@@ -9,14 +9,9 @@ import { NextRequest, NextResponse } from 'next/server'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { dateFrom, dateTo, accountManager, fieldRep } = body
+    const { dateFrom, dateTo } = body
 
-    console.log('API /metrics - Request:', {
-      dateFrom,
-      dateTo,
-      accountManager,
-      fieldRep,
-    })
+    console.log('API /metrics - Request:', { dateFrom, dateTo })
 
     // Create server client (uses service role key)
     const supabase = await createServerClient()
@@ -32,14 +27,26 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('API /metrics - User authenticated:', user.id)
+    // Get user profile for role-based filtering
+    const { data: profile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('role, full_name, organization')
+      .eq('id', user.id)
+      .single()
 
-    // Call the RPC function
+    if (profileError || !profile) {
+      return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
+    }
+
+    console.log('API /metrics - User role:', profile.role)
+
+    // Call the RPC function with server-side role enforcement
     const { data, error } = await supabase.rpc('calculate_dashboard_metrics', {
       p_date_from: dateFrom,
       p_date_to: dateTo,
-      p_account_manager: accountManager,
-      p_field_rep: fieldRep,
+      p_user_role: profile.role,
+      p_user_name: profile.full_name,
+      p_organization: profile.organization,
     } as never)
 
     if (error) {

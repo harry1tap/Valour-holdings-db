@@ -2,6 +2,9 @@
 -- Update calculate_dashboard_metrics function to include pending_surveys
 -- ============================================================================
 
+-- Drop the existing function first (required when changing return type)
+DROP FUNCTION IF EXISTS calculate_dashboard_metrics(TIMESTAMPTZ, TIMESTAMPTZ, TEXT, TEXT);
+
 CREATE OR REPLACE FUNCTION calculate_dashboard_metrics(
   p_date_from TIMESTAMPTZ,
   p_date_to TIMESTAMPTZ,
@@ -25,7 +28,7 @@ BEGIN
   SELECT
     COUNT(*)::BIGINT as total_leads,
     COUNT("Survey_Booked_Date")::BIGINT as surveys_booked,
-    COUNT(CASE WHEN "Survey_Booked_Date" IS NOT NULL AND "Survey_Status" IS NULL THEN 1 END)::BIGINT as pending_surveys,
+    COUNT(CASE WHEN "Survey_Status" = 'Pending' THEN 1 END)::BIGINT as pending_surveys,
     COUNT(CASE WHEN "Survey_Status" = 'Good Survey' THEN 1 END)::BIGINT as good_surveys,
     COUNT(CASE WHEN "Survey_Status" = 'Bad Survey' THEN 1 END)::BIGINT as bad_surveys,
     COUNT(CASE WHEN "Survey_Status" = 'Sold Survey' THEN 1 END)::BIGINT as sold_surveys,

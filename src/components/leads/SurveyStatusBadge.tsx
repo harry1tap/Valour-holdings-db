@@ -6,11 +6,12 @@
 'use client'
 
 import { useState } from 'react'
-import { Check, AlertCircle, DollarSign, MoreVertical } from 'lucide-react'
+import { Check, AlertCircle, DollarSign, Clock, MoreVertical } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
@@ -38,7 +39,7 @@ export function SurveyStatusBadge({
   }
 
   const handleStatusChange = async (
-    newStatus: 'Good Survey' | 'Bad Survey' | 'Sold Survey' | null
+    newStatus: 'Pending' | 'Good Survey' | 'Bad Survey' | 'Sold Survey' | null
   ) => {
     setIsUpdating(true)
     try {
@@ -82,6 +83,12 @@ export function SurveyStatusBadge({
           variant: 'default' as const,
           icon: <DollarSign className="h-3 w-3" />,
         }
+      case 'Pending':
+        return {
+          label: 'Pending',
+          variant: 'outline' as const,
+          icon: null,
+        }
       default:
         return {
           label: 'Pending',
@@ -110,6 +117,11 @@ export function SurveyStatusBadge({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => handleStatusChange('Pending')}>
+          <Clock className="h-4 w-4 mr-2 text-gray-500" />
+          Mark as Pending
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => handleStatusChange('Good Survey')}>
           <Check className="h-4 w-4 mr-2 text-green-500" />
           Good Survey

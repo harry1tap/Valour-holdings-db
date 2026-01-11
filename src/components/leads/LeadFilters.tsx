@@ -93,13 +93,11 @@ export function LeadFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Statuses</SelectItem>
-            <SelectItem value="New">New</SelectItem>
-            <SelectItem value="Contacted">Contacted</SelectItem>
-            <SelectItem value="Qualified">Qualified</SelectItem>
+            <SelectItem value="New Lead">New Lead</SelectItem>
             <SelectItem value="Survey Booked">Survey Booked</SelectItem>
             <SelectItem value="Survey Complete">Survey Complete</SelectItem>
-            <SelectItem value="Sold">Sold</SelectItem>
-            <SelectItem value="Lost">Lost</SelectItem>
+            <SelectItem value="Install Complete">Install Complete</SelectItem>
+            <SelectItem value="Fall Off">Fall Off</SelectItem>
           </SelectContent>
         </Select>
 
@@ -118,10 +116,10 @@ export function LeadFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Survey Status</SelectItem>
-            <SelectItem value="Good">Good</SelectItem>
-            <SelectItem value="Average">Average</SelectItem>
-            <SelectItem value="Poor">Poor</SelectItem>
-            <SelectItem value="Not Suitable">Not Suitable</SelectItem>
+            <SelectItem value="Pending">Pending</SelectItem>
+            <SelectItem value="Good Survey">Good Survey</SelectItem>
+            <SelectItem value="Bad Survey">Bad Survey</SelectItem>
+            <SelectItem value="Sold Survey">Sold Survey</SelectItem>
           </SelectContent>
         </Select>
 

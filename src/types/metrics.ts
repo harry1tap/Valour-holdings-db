@@ -30,6 +30,7 @@ export interface DashboardMetrics {
 export interface StaffPerformance {
   staff_name: string
   total_leads: number
+  pending_surveys: number
   good_surveys: number
   bad_surveys: number
   sold_surveys: number

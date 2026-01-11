@@ -140,9 +140,9 @@ export async function PUT(request: NextRequest) {
     // Get user profile for role-based permissions
     const { data: profile, error: profileError } = await supabase
       .from('user_profiles')
-      .select('role, full_name')
+      .select('role, full_name, organization')
       .eq('id', user.id)
-      .single() as { data: Pick<UserProfile, 'role' | 'full_name'> | null; error: Error | null }
+      .single() as { data: Pick<UserProfile, 'role' | 'full_name' | 'organization'> | null; error: Error | null }
 
     if (profileError || !profile) {
       console.error('API /leads PUT - Profile error:', profileError)
@@ -152,27 +152,14 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    // Role-based permission check
-    // Field reps can only edit Notes and Installer_Notes
-    if (profile.role === 'field_rep') {
-      const allowedFields = ['Notes', 'Installer_Notes']
-      const editedFields = Object.keys(updateData)
-      const hasUnauthorizedFields = editedFields.some(
-        (field) => !allowedFields.includes(field)
-      )
-
-      if (hasUnauthorizedFields) {
-        return NextResponse.json(
-          { error: 'Insufficient permissions to edit these fields' },
-          { status: 403 }
-        )
-      }
-    }
-
-    // Update the lead using RPC function
+    // Update the lead using RPC function with role-based filtering
+    // Field-level permissions are enforced in the RPC function
     const { data, error } = await supabase.rpc('update_solar_lead', {
       p_lead_id: id,
       p_lead_data: updateData,
+      p_user_role: profile.role,
+      p_user_name: profile.full_name,
+      p_organization: profile.organization,
     } as never)
 
     if (error) {
@@ -236,16 +223,18 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Only admins and account managers can delete leads
-    if (profile.role === 'field_rep') {
+    if (profile.role !== 'admin' && profile.role !== 'account_manager') {
       return NextResponse.json(
         { error: 'Insufficient permissions to delete leads' },
         { status: 403 }
       )
     }
 
-    // Delete the lead using RPC function
+    // Delete the lead using RPC function with role-based filtering
     const { data, error } = await supabase.rpc('delete_solar_lead', {
       p_lead_id: parseInt(id),
+      p_user_role: profile.role,
+      p_user_name: profile.full_name,
     } as never)
 
     if (error) {

@@ -42,8 +42,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Field reps cannot create leads (only admins and account managers)
-    if (profile.role === 'field_rep') {
+    // Only admins and account managers can create leads
+    if (profile.role !== 'admin' && profile.role !== 'account_manager') {
       return NextResponse.json(
         { error: 'Insufficient permissions to create leads' },
         { status: 403 }
@@ -67,9 +67,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Insert the new lead using RPC function
+    // Insert the new lead using RPC function with role check
     const { data, error } = await supabase.rpc('create_solar_lead', {
       p_lead_data: body,
+      p_user_role: profile.role,
     } as never)
 
     if (error) {

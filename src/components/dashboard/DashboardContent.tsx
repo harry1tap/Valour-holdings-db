@@ -57,13 +57,15 @@ export function DashboardContent({
       {/* Conversion Funnel - Full Width */}
       <ConversionFunnelChart metrics={metrics} loading={loading} />
 
-      {/* Staff Performance Table */}
-      <StaffPerformanceTable
-        dateFrom={dateFrom}
-        dateTo={dateTo}
-        userRole={userRole}
-        userName={userName}
-      />
+      {/* Staff Performance Table - Hidden for Account Managers */}
+      {userRole !== 'account_manager' && (
+        <StaffPerformanceTable
+          dateFrom={dateFrom}
+          dateTo={dateTo}
+          userRole={userRole}
+          userName={userName}
+        />
+      )}
     </>
   )
 }

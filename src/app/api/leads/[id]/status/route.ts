@@ -7,7 +7,7 @@ import { createServerClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
 interface StatusUpdateRequest {
-  survey_status: 'Good Survey' | 'Bad Survey' | 'Sold Survey' | null
+  survey_status: 'Pending' | 'Good Survey' | 'Bad Survey' | 'Sold Survey' | null
 }
 
 export async function PATCH(
@@ -27,10 +27,21 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Get user profile for role-based access
+    const { data: profile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('role, full_name, organization')
+      .eq('id', user.id)
+      .single()
+
+    if (profileError || !profile) {
+      return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
+    }
+
     const { survey_status }: StatusUpdateRequest = await request.json()
 
     // Validate survey status
-    const validStatuses = ['Good Survey', 'Bad Survey', 'Sold Survey', null]
+    const validStatuses = ['Pending', 'Good Survey', 'Bad Survey', 'Sold Survey', null]
     if (!validStatuses.includes(survey_status)) {
       return NextResponse.json(
         { error: 'Invalid survey status' },
@@ -48,10 +59,13 @@ export async function PATCH(
       )
     }
 
-    // Update survey status using RPC function
+    // Update survey status using RPC function with role-based filtering
     const { data, error } = await supabase.rpc('update_survey_status', {
       p_lead_id: leadId,
       p_survey_status: survey_status,
+      p_user_role: profile.role,
+      p_user_name: profile.full_name,
+      p_organization: profile.organization,
     } as never)
 
     if (error) {

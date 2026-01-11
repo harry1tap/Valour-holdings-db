@@ -6,6 +6,7 @@ export interface User {
   fullName: string
   role: UserRole
   accountManagerName?: string | null
+  organization?: string | null
   isActive: boolean
 }
 
