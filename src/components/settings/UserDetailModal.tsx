@@ -35,7 +35,7 @@ import type { UserProfile, UserRole } from '@/types/database'
 const userUpdateSchema = z
   .object({
     full_name: z.string().min(2, 'Name must be at least 2 characters'),
-    role: z.enum(['admin', 'account_manager', 'field_rep']),
+    role: z.enum(['admin', 'account_manager', 'field_rep', 'installer']),
     account_manager_name: z.string().optional(),
   })
   .refine(
@@ -193,6 +193,7 @@ export function UserDetailModal({
                 <SelectItem value="admin">Admin</SelectItem>
                 <SelectItem value="account_manager">Account Manager</SelectItem>
                 <SelectItem value="field_rep">Field Rep</SelectItem>
+                <SelectItem value="installer" disabled>Installer (View Only)</SelectItem>
               </SelectContent>
             </Select>
             {errors.role && (

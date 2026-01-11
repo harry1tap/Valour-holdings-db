@@ -159,7 +159,7 @@ export function UserCreateModal({
             <Label htmlFor="role">
               Role <span className="text-destructive">*</span>
             </Label>
-            <Select onValueChange={(value) => setValue('role', value as UserRole)}>
+            <Select onValueChange={(value) => setValue('role', value as 'admin' | 'account_manager' | 'field_rep')}>
               <SelectTrigger>
                 <SelectValue placeholder="Select a role..." />
               </SelectTrigger>

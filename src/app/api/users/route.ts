@@ -119,6 +119,14 @@ export async function POST(request: Request) {
       )
     }
 
+    // 3.5. Validate role (installers cannot be created via UI)
+    if (!['admin', 'account_manager', 'field_rep'].includes(role)) {
+      return NextResponse.json(
+        { error: 'Invalid role. Can only create admin, account_manager, or field_rep users.' },
+        { status: 400 }
+      )
+    }
+
     // 4. Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {

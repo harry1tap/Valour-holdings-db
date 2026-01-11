@@ -34,6 +34,7 @@ const roleColors: Record<string, string> = {
   admin: 'bg-purple-100 text-purple-800',
   account_manager: 'bg-blue-100 text-blue-800',
   field_rep: 'bg-gray-100 text-gray-800',
+  installer: 'bg-orange-100 text-orange-800',
 }
 
 // Role display names
@@ -41,6 +42,7 @@ const roleLabels: Record<string, string> = {
   admin: 'Admin',
   account_manager: 'Account Manager',
   field_rep: 'Field Rep',
+  installer: 'Installer',
 }
 
 export function UsersTable({

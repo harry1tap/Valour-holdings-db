@@ -38,7 +38,7 @@ export type LoginFormData = z.infer<typeof loginSchema>
 export const createUserSchema = z.object({
   email: z.string().email('Invalid email address'),
   fullName: z.string().min(2, 'Full name is required'),
-  role: z.enum(['admin', 'account_manager', 'field_rep']),
+  role: z.enum(['admin', 'account_manager', 'field_rep', 'installer']),
   accountManagerName: z.string().optional(),
 })
 

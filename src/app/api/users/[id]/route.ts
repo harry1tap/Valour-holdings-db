@@ -124,6 +124,14 @@ export async function PUT(
       )
     }
 
+    // Validate role
+    if (!['admin', 'account_manager', 'field_rep', 'installer'].includes(role)) {
+      return NextResponse.json(
+        { error: 'Invalid role' },
+        { status: 400 }
+      )
+    }
+
     // Update user
     const { data: updatedUser, error: updateError } = (await supabase
       .from('user_profiles')
