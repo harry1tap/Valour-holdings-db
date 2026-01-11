@@ -67,9 +67,10 @@ export function AppSidebar() {
   }, [error, loading, profile, role])
 
   // Filter nav items based on user role
+  // Installers don't have dashboard navigation access
   const visibleNavItems = React.useMemo(() => {
-    if (!role) return []
-    return navItems.filter((item) => item.allowedRoles.includes(role))
+    if (!role || role === 'installer') return []
+    return navItems.filter((item) => item.allowedRoles.includes(role as 'admin' | 'account_manager' | 'field_rep'))
   }, [role])
 
   return (

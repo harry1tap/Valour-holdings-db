@@ -115,9 +115,10 @@ export function Sidebar() {
   }
 
   // Filter nav items based on user role
-  const visibleNavItems = navItems.filter((item) =>
-    item.allowedRoles.includes(role)
-  )
+  // Installers don't have dashboard navigation access
+  const visibleNavItems = role && role !== 'installer'
+    ? navItems.filter((item) => item.allowedRoles.includes(role as 'admin' | 'account_manager' | 'field_rep'))
+    : []
 
   console.log('Sidebar: Rendering normal state with navigation', {
     role,
