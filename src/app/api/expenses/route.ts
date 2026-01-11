@@ -7,6 +7,7 @@
 
 import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import type { UserProfile } from '@/types/database'
 
 export async function POST(request: NextRequest) {
   try {
@@ -44,11 +45,11 @@ export async function POST(request: NextRequest) {
       }
 
       // Check user role (only admins can create expenses via UI)
-      const { data: profile, error: profileError } = await supabase
+      const { data: profile, error: profileError } = (await supabase
         .from('user_profiles')
         .select('role')
         .eq('id', user.id)
-        .single()
+        .single()) as { data: Pick<UserProfile, 'role'> | null; error: Error | null }
 
       if (profileError || !profile) {
         console.error('API /expenses - Profile error:', profileError)
